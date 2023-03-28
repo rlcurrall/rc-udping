@@ -41,13 +41,13 @@ int start_listen(ListenOptions *options)
     }
 
     // Bind the socket to the specified port
-    struct sockaddr_in servaddr;
-    memset(&servaddr, 0, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(options->port);
+    struct sockaddr_in serv_addr;
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_port = htons(options->port);
 
-    if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
+    if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         perror("bind() failed");
         return 1;
@@ -56,14 +56,14 @@ int start_listen(ListenOptions *options)
     printf("UDP ping server listening on port %d...\n", options->port);
 
     char buf[BUFFER_SIZE];
-    struct sockaddr_in cliaddr;
-    socklen_t cliaddrlen = sizeof(cliaddr);
+    struct sockaddr_in cli_addr;
+    socklen_t cli_addr_len = sizeof(cli_addr);
 
     // Listen for incoming UDP packets
     for (;;)
     {
         // Wait for incoming UDP packet
-        int n = recvfrom(sockfd, buf, BUFFER_SIZE, 0, (struct sockaddr *)&cliaddr, &cliaddrlen);
+        int n = recvfrom(sockfd, buf, BUFFER_SIZE, 0, (struct sockaddr *)&cli_addr, &cli_addr_len);
         if (n < 0)
         {
             perror("recvfrom() failed");
@@ -73,9 +73,9 @@ int start_listen(ListenOptions *options)
         // Check if the received packet is a ping request
         if (strcmp(buf, "PING") == 0)
         {
-            printf("Received ping request from %s:%d\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
+            printf("Received ping request from %s:%d\n", inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port));
             // Generate a ping response packet and send it back to the client
-            n = sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
+            n = sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&cli_addr, sizeof(cli_addr));
             if (n < 0)
             {
                 perror("sendto() failed");
