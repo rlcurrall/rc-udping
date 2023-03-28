@@ -1,4 +1,3 @@
-// queue.h
 #include <stdbool.h>
 
 #ifndef QUEUE_H

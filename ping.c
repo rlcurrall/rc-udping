@@ -101,7 +101,7 @@ void *producer(void *options)
         clock_gettime(CLOCK_MONOTONIC, &start);
         make_ping_request(sockfd, servaddr);
         clock_gettime(CLOCK_MONOTONIC, &end);
-        int elapsed = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_nsec - start.tv_nsec) / 1000;
+        int elapsed = (end.tv_sec - start.tv_sec) * 1000000000 + (end.tv_nsec - start.tv_nsec);
         enqueue(ping_options->queue, elapsed);
     }
 
@@ -175,10 +175,10 @@ void *consumer(void *options)
 
     printf("Statistics\n");
     printf("    Request Count: %d\n", count);
-    printf("    Sum (ns):      %d\n", sum);
-    printf("    Max (ns):      %d\n", max);
-    printf("    Min (ns):      %d\n", min);
-    printf("    Average (ns):   %f\n", (float)sum / count);
+    printf("    Sum (ms):      %f\n", (float) sum / 1000000);
+    printf("    Max (ms):      %f\n", (float) max / 1000000);
+    printf("    Min (ms):      %f\n", (float) min / 1000000);
+    printf("    Average (ms):   %f\n", (float) sum / count / 1000000);
 
     pthread_exit(NULL);
 }
