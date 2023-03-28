@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "queue.h"
-#include "ping.h"
-#include "listen.h"
+#include "lib/queue.h"
+#include "lib/ping.h"
+#include "lib/listen.h"
 
 void print_usage();
 
