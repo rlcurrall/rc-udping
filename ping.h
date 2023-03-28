@@ -3,7 +3,8 @@
 #ifndef PING_H
 #define PING_H
 
-typedef struct PingOptions {
+typedef struct PingOptions
+{
     char *remote_host;
     int remote_port;
     int delay;

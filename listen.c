@@ -5,34 +5,37 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <string.h>
 #include <unistd.h>
 
 #include "listen.h"
 
 #define BUFFER_SIZE 1024
 
-int parse_listen_options(int argc, char *argv[], ListenOptions* options)
+int parse_listen_options(int argc, char *argv[], ListenOptions *options)
 {
     int opt;
 
-    while ((opt = getopt(argc, argv, "p:")) != -1) {
-        switch (opt) {
-            case 'p':
-                options->port = atoi(optarg);
-                break;
-            default:
-                return 1;
+    while ((opt = getopt(argc, argv, "p:")) != -1)
+    {
+        switch (opt)
+        {
+        case 'p':
+            options->port = atoi(optarg);
+            break;
+        default:
+            return 1;
         }
     }
 
     return 0;
 }
 
-int start_listen(ListenOptions* options) {
+int start_listen(ListenOptions *options)
+{
     // Create a UDP socket
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0) {
+    if (sockfd < 0)
+    {
         perror("socket() failed");
         return 1;
     }
@@ -44,7 +47,8 @@ int start_listen(ListenOptions* options) {
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(options->port);
 
-    if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+    if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
+    {
         perror("bind() failed");
         return 1;
     }
@@ -56,20 +60,24 @@ int start_listen(ListenOptions* options) {
     socklen_t cliaddrlen = sizeof(cliaddr);
 
     // Listen for incoming UDP packets
-    for (;;) {
+    for (;;)
+    {
         // Wait for incoming UDP packet
         int n = recvfrom(sockfd, buf, BUFFER_SIZE, 0, (struct sockaddr *)&cliaddr, &cliaddrlen);
-        if (n < 0) {
+        if (n < 0)
+        {
             perror("recvfrom() failed");
             continue;
         }
 
         // Check if the received packet is a ping request
-        if (strcmp(buf, "PING") == 0) {
+        if (strcmp(buf, "PING") == 0)
+        {
             printf("Received ping request from %s:%d\n", inet_ntoa(cliaddr.sin_addr), ntohs(cliaddr.sin_port));
             // Generate a ping response packet and send it back to the client
             n = sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
-            if (n < 0) {
+            if (n < 0)
+            {
                 perror("sendto() failed");
                 continue;
             }

@@ -6,13 +6,16 @@
 
 void print_usage();
 
-int main(int argc, char *argv[]) {
-    if (argc < 2) {
+int main(int argc, char *argv[])
+{
+    if (argc < 2)
+    {
         print_usage();
         return 1;
     }
 
-    if (strcmp(argv[1], "ping") == 0) {
+    if (strcmp(argv[1], "ping") == 0)
+    {
         Queue queue;
         initQueue(&queue);
         struct PingOptions ping_options = {
@@ -20,21 +23,26 @@ int main(int argc, char *argv[]) {
             .remote_port = 5000,
             .delay = 0,
             .num_pings = 10,
-            .queue = &queue
-        };
-        if (parse_ping_options(argc, argv, &ping_options) != 0) {
+            .queue = &queue};
+        if (parse_ping_options(argc, argv, &ping_options) != 0)
+        {
             return 1;
         }
 
         return start_ping(&ping_options);
-    } else if (strcmp(argv[1], "listen") == 0) {
-        struct ListenOptions listen_options = { .port = 5000 };
-        if (parse_listen_options(argc, argv, &listen_options) != 0) {
+    }
+    else if (strcmp(argv[1], "listen") == 0)
+    {
+        struct ListenOptions listen_options = {.port = 5000};
+        if (parse_listen_options(argc, argv, &listen_options) != 0)
+        {
             return 1;
         }
 
         return start_listen(&listen_options);
-    } else {
+    }
+    else
+    {
         print_usage();
         return 1;
     }
@@ -42,7 +50,8 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void print_usage() {
+void print_usage()
+{
     printf("Usage: program_name <ping|listen> [options]\n");
     printf("Options:\n");
     printf("  ping:\n");
