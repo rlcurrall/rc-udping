@@ -15,7 +15,7 @@
 void *producer(void *options);
 void *consumer(void *arg);
 void handler(int signal_number);
-void make_ping_request(int sockfd, struct sockaddr_in servaddr);
+void make_ping_request(int sockfd, struct sockaddr_in serv_addr);
 
 pthread_t sender, receiver;
 sig_atomic_t doneFlag = 0;
@@ -87,11 +87,11 @@ void *producer(void *options)
     }
 
     // Set the server address and port
-    struct sockaddr_in servaddr;
-    memset(&servaddr, 0, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr(ping_options->remote_host);
-    servaddr.sin_port = htons(ping_options->remote_port);
+    struct sockaddr_in serv_addr;
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = inet_addr(ping_options->remote_host);
+    serv_addr.sin_port = htons(ping_options->remote_port);
 
     // Close the socket
 
@@ -99,7 +99,7 @@ void *producer(void *options)
     {
         struct timespec start, end;
         clock_gettime(CLOCK_MONOTONIC, &start);
-        make_ping_request(sockfd, servaddr);
+        make_ping_request(sockfd, serv_addr);
         clock_gettime(CLOCK_MONOTONIC, &end);
         int elapsed = (end.tv_sec - start.tv_sec) * 1000000000 + (end.tv_nsec - start.tv_nsec);
         enqueue(ping_options->queue, elapsed);
@@ -116,10 +116,10 @@ void *producer(void *options)
     pthread_exit(NULL);
 }
 
-void make_ping_request(int sockfd, struct sockaddr_in servaddr)
+void make_ping_request(int sockfd, struct sockaddr_in serv_addr)
 {
     // Send a UDP ping request to the server
-    int n = sendto(sockfd, "PING", strlen("PING"), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+    int n = sendto(sockfd, "PING", strlen("PING"), 0, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (n < 0)
     {
         perror("sendto() failed");
@@ -129,9 +129,9 @@ void make_ping_request(int sockfd, struct sockaddr_in servaddr)
     // Wait for the ping response from the server
     char buf[1024];
     struct sockaddr_in fromaddr;
-    socklen_t fromaddrlen = sizeof(fromaddr);
+    socklen_t from_addr_len = sizeof(fromaddr);
 
-    n = recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *)&fromaddr, &fromaddrlen);
+    n = recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *)&fromaddr, &from_addr_len);
     if (n < 0)
     {
         perror("recvfrom() failed");
